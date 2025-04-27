@@ -1,0 +1,32 @@
+name: deploy
+on: { push: { branches: [master] } }
+env:
+  GIT_USER_NAME: github-actions[bot]
+  GIT_USER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+permissions:
+  contents: write
+jobs:
+  reapack-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.2.2' }
+      - name: Install Pandoc
+        run:  sudo apt-get install -yy pandoc
+      - name: Install reapack-index
+        run:  gem install reapack-index
+      - name: Fetch repository
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Configure git
+        run: |
+          git config user.name ${{ env.GIT_USER_NAME }}
+          git config user.email ${{ env.GIT_USER_EMAIL }}
+          git checkout index
+      - name: Update index.xml
+        run: |
+          git merge master
+          reapack-index --commit
+      - name: Push changes
+        run:  git push

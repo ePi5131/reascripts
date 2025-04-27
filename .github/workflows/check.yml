@@ -1,0 +1,19 @@
+name: check
+on:
+  push: { branches-ignore: [index] }
+  pull_request:
+jobs:
+  reapack-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.2.2' }
+      - name: Install Pandoc
+        run:  sudo apt-get install -yy pandoc
+      - name: Install reapack-index
+        run:  gem install reapack-index
+      - name: Fetch repository
+        uses: actions/checkout@v4
+      - name: Validate packages
+        run:  reapack-index --check
